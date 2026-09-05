@@ -265,7 +265,7 @@ python graph/ring_investigation_report.py --input features/unified_detector_test
 
 Create an evidence case:
 
-python agents/fraud_investigator.py --transaction pay_0000309422
+python agents/fraud_investigator.py --transaction pay_0000309422 --history features/features.csv --detector features/unified_detector_test.csv
 
 Run the Gemini investigator:
 
@@ -308,5 +308,6 @@ evidence reconstruction
 LLM-assisted investigation
 
 The project explicitly separates real-time detection from post-detection investigation and avoids look-ahead leakage in its reported causal metrics.
+
 
 
