@@ -1,0 +1,78 @@
+{
+  "transaction": {
+    "transaction_id": "pay_0000309422",
+    "customer_id": "cust_0000004431",
+    "device_id": "dev_0000005103",
+    "instrument_id": "inst_0000006008",
+    "ip_bucket": "ip_24251",
+    "amount": 567359.0,
+    "timestamp": 1787545080,
+    "ml_score": 0.9999535,
+    "ml_flag": 1,
+    "graph_ring_flag": 1,
+    "combined_flag": 1
+  },
+  "model_signals": {
+    "velocity_1h": 0,
+    "velocity_24h": 0,
+    "time_since_last_txn_sec": 122346.0,
+    "is_new_device": 0,
+    "is_new_instrument": 1,
+    "amount_log_ratio": 1.0749037073383594
+  },
+  "customer_history": {
+    "prior_transaction_count": 54,
+    "last_prior_transaction": "pay_0000273406"
+  },
+  "device_history": {
+    "prior_transaction_count": 54,
+    "prior_customer_count": 1
+  },
+  "instrument_history": {
+    "prior_transaction_count": 2,
+    "prior_customer_count": 2,
+    "prior_device_count": 2
+  },
+  "graph_evidence": {
+    "prior_instrument_customer_count": 2,
+    "prior_instrument_customers": [
+      "cust_0000001932",
+      "cust_0000004273"
+    ],
+    "prior_instrument_device_count": 2,
+    "prior_instrument_devices": [
+      "dev_0000002218",
+      "dev_0000004923"
+    ],
+    "prior_transactions_within_30m": 2,
+    "prior_transaction_ids_within_30m": [
+      "pay_0000309420",
+      "pay_0000309421"
+    ],
+    "prior_ip_customer_count": 4,
+    "prior_ip_customers": [
+      "cust_0000001932",
+      "cust_0000002085",
+      "cust_0000004273",
+      "cust_0000004282"
+    ],
+    "shared_instrument_condition": 1,
+    "shared_ip_condition": 1,
+    "recent_burst_condition": 1,
+    "reconstructed_graph_flag": 1
+  },
+  "evaluation_only": {
+    "is_fraud_evaluation_only": true,
+    "fraud_type_evaluation_only": "shared_instrument_ring"
+  },
+  "decision": {
+    "decision": "ESCALATE_HIGH_RISK",
+    "confidence": "HIGH",
+    "reasons": [
+      "XGBoost score 1.0000 is above the production operating threshold.",
+      "Causal graph evidence was observable before the transaction: 2 prior customers had used the instrument.",
+      "2 prior transaction(s) were observed on the same instrument within 30 minutes.",
+      "Device has 54 prior transaction(s) associated with the same customer/device context."
+    ]
+  }
+}

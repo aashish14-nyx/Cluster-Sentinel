@@ -1,0 +1,7 @@
+cluster_id,instrument_id,trigger_count,trigger_transaction_ids,trigger_customers,max_prior_instrument_customers,max_prior_transactions_within_30m,any_recent_burst,any_shared_ip,fraud_count_evaluation_only,ring_fraud_count_evaluation_only
+inst_0000006004_cluster_1,inst_0000006004,2,pay_0000309402|pay_0000309405,cust_0000002372|cust_0000004282,3,3,1,1,2,2
+inst_0000006008_cluster_1,inst_0000006008,1,pay_0000309422,cust_0000004431,2,2,1,1,1,1
+inst_0000006012_cluster_1,inst_0000006012,2,pay_0000309439|pay_0000309438,cust_0000002839|cust_0000004963,3,3,1,1,2,2
+inst_0000006016_cluster_1,inst_0000006016,1,pay_0000309453,cust_0000004693,2,2,1,1,1,1
+inst_0000006035_cluster_1,inst_0000006035,1,pay_0000309531,cust_0000004150,2,2,1,1,1,1
+inst_0000006040_cluster_1,inst_0000006040,2,pay_0000309548|pay_0000309550,cust_0000003806|cust_0000003853,3,3,1,1,2,2

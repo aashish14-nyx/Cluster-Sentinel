@@ -1,0 +1,11 @@
+pandas
+numpy
+scikit-learn
+xgboost
+networkx
+python-dotenv
+pydantic
+google-genai
+requests
+razorpay
+flask
