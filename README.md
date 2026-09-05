@@ -1,16 +1,14 @@
-Cluster Sentinel
+# Cluster Sentinel
 
 Cluster Sentinel is a production-inspired fraud/abuse detection pipeline for three synthetic abuse patterns:
 
-velocity_abuse
-
-device_takeover
-
-shared_instrument_ring
+1. velocity_abuse
+2. device_takeover
+3. shared_instrument_ring
 
 The project combines causal transaction features, cost-sensitive XGBoost, a causal streaming graph signal, deterministic investigation evidence collection, and a Gemini-powered investigation assistant.
 
-Architecture
+## Architecture
 
                          Synthetic transactions
                                   |
@@ -18,7 +16,7 @@ Architecture
                        Causal feature engineering
                                   |
                                   v
-                         +----------------+
+                         +----------------
                          |    XGBoost     |
                          | transaction    |
                          | risk detector  |
@@ -44,75 +42,54 @@ Architecture
                                   v
                   Analyst summary / next actions
 
-Key design decisions
+## Key design decisions
 
-Causal features
+### Causal features
 
 Features are computed chronologically so each transaction only uses information available before that transaction.
 
 Examples:
 
-velocity_1h
+- velocity_1h
+- velocity_24h
+- time_since_last_txn_sec
+- has_previous_txn
+- amount_log_ratio
+- is_new_device
+- is_new_instrument
+- device_customer_count_before
+- instrument_customer_count_before
 
-velocity_24h
-
-time_since_last_txn_sec
-
-has_previous_txn
-
-amount_log_ratio
-
-is_new_device
-
-is_new_instrument
-
-device_customer_count_before
-
-instrument_customer_count_before
-
-Time-based evaluation
+### Time-based evaluation
 
 The data is evaluated chronologically using train/validation/test partitions rather than a random split.
 
 This is important for fraud detection because future behavior must not influence the past.
 
-Cost-sensitive threshold selection
+## Cost-sensitive threshold selection
 
 The XGBoost validation threshold is selected using:
 
-false-negative cost = 10
-
-false-positive cost = 1
+- false-negative cost = 10
+- false-positive cost = 1
 
 The selected operating threshold is 0.90.
 
-Model result
+### Model result
 
 On the chronological test set:
 
-Metric
+Metric                            XGBoost
 
-XGBoost
+Precision                          0.669
 
-Precision
+Recall                             0.876
 
-0.669
+F1                                 0.759
 
-Recall
+PR-AUC                             0.917
 
-0.876
-
-F1
-
-0.759
-
-PR-AUC
-
-0.917
-
-ROC-AUC
-
-1.000
+ROC-AUC                            1.000
 
 Confusion matrix:
 
@@ -121,15 +98,13 @@ FP = 49
 FN = 14
 TN = 46,272
 
-Error analysis
+### Error analysis
 
 The 14 false negatives were:
 
-7 velocity_abuse
-
-6 shared_instrument_ring
-
-1 device_takeover
+- 7 velocity_abuse
+- 6 shared_instrument_ring
+- 1 device_takeover
 
 The missed velocity cases demonstrate a point-in-time limitation: some planted velocity cases did not have enough observable velocity at the exact transaction timestamp.
 
@@ -137,7 +112,7 @@ The missed ring cases are primarily early ring members. Before enough customers 
 
 This is intentional: the project does not use look-ahead evidence to inflate causal detection metrics.
 
-Causal graph layer
+### Causal graph layer
 
 The graph layer processes transactions as a stream.
 
@@ -156,35 +131,25 @@ At the selected XGBoost threshold, the 9 causal graph flags were already among t
 
 Its value is therefore primarily in network evidence and investigation context rather than pretending to be an incremental detector.
 
-Investigation layer
+### Investigation layer
 
 graph/ring_investigation_report.py reconstructs the state available before each graph-triggered transaction.
 
 For each trigger it can show:
 
-prior customers on the instrument
+- prior customers on the instrument
+- prior devices
+- prior transactions in the 30-minute window
+- prior IP customers
+- shared-instrument condition
+- recent-burst condition
+- reconstructed causal graph flag
 
-prior devices
+This separates:  Real-time detection
 
-prior transactions in the 30-minute window
+from: Post-detection investigation
 
-prior IP customers
-
-shared-instrument condition
-
-recent-burst condition
-
-reconstructed causal graph flag
-
-This separates:
-
-Real-time detection
-
-from:
-
-Post-detection investigation
-
-LLM investigation layer
+### LLM investigation layer
 
 agents/fraud_investigator.py collects deterministic evidence and writes a structured JSON case.
 
@@ -192,27 +157,22 @@ agents/llm_investigator.py sends that evidence to Gemini.
 
 The LLM is deliberately not the fraud detector. It:
 
-explains evidence
-
-forms a hypothesis
-
-states uncertainty
-
-recommends investigator actions
+-  explains evidence
+- forms a hypothesis
+- states uncertainty
+- recommends investigator actions
 
 Evaluation labels are redacted before the Gemini call.
 
-Targeted LLM evaluation
+### Targeted LLM evaluation
 
 A targeted 15-case evaluation was used to check the investigation assistant.
 
 Earlier v2 results were:
 
-fraud-typology hypothesis match: 7/9
-
-legitimate alerts safely handled: 4/6
-
-overall targeted checks: 11/15
+- fraud-typology hypothesis match: 7/9
+- legitimate alerts safely handled: 4/6
+- overall targeted checks: 11/15
 
 The main observed weakness was over-classifying some legitimate alerts as velocity_abuse. The investigator was therefore updated to allow:
 
@@ -222,13 +182,13 @@ This prevents the assistant from being forced into one of the three planted frau
 
 The Gemini API free-tier quota was then reached during the broader v3 run, so no larger v3 result is claimed.
 
-Important evaluation rule
+### Important evaluation rule
 
 An older retrospective graph implementation used the complete dataset, including future test events. Its results must not be reported as causal production-style metrics.
 
 The causal headline metrics in this README come from the prior-state streaming implementation.
 
-Example case flow
+### Example case flow
 
 pay_0000309422
     |
@@ -247,7 +207,7 @@ pay_0000309422
            HIGH
            shared_instrument_ring
 
-Run order
+### Run order
 
 From the project root:
 
@@ -271,17 +231,17 @@ Run the Gemini investigator:
 
 python agents/llm_investigator.py --case features/investigation_cases/case_pay_0000309422.json
 
-Security
+### Security
 
 Never commit .env.
 
 The Gemini API key belongs in:
 
-GEMINI_API_KEY=...
+GEMINI_API_KEY=.....
 
 The repository should keep .env in .gitignore.
 
-Limitations
+### Limitations
 
 This is a synthetic fraud/abuse detection project. The dataset is designed for causal experimentation and does not represent real payment behavior.
 
@@ -289,7 +249,7 @@ The graph detector is intentionally conservative. Early ring members may be invi
 
 The LLM layer is an investigation assistant, not an automated adjudication system.
 
-Portfolio takeaway
+## Portfolio takeaway
 
 The strongest engineering story is not "XGBoost got a high score."
 
