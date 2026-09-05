@@ -443,15 +443,15 @@ def main():
                         help="Investigate first K combined-flagged transactions.")
     parser.add_argument(
         "--detector",
-        default="../features/unified_detector_test.csv",
+        default="features/unified_detector_test.csv",
     )
     parser.add_argument(
         "--history",
-        default="../features/features.csv",
+        default="features/features.csv",
     )
     parser.add_argument(
         "--output",
-        default="../features/investigation_cases",
+        default="features/investigation_cases",
     )
     args = parser.parse_args()
 
